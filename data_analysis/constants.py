@@ -1,0 +1,18 @@
+JOBS_OPTIONS = [
+    'acptMthd',
+    'deadline',
+    'emplymShp',
+    'emplymShpNm',
+    'frDd',
+    'jobId',
+    'jobcls',
+    'jobclsNm',
+    'oranNm',
+    'organYn',
+    'recrtTitle',
+    'stmId',
+    'stmNm',
+    'toDd',
+    'workPlc',
+    'workPlcNm',
+]
