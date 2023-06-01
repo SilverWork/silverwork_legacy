@@ -1,3 +1,4 @@
+# xlml 없다면 install하기(pip install lxml)
 import concurrent.futures
 import time
 
@@ -37,7 +38,7 @@ def process_api_request(url):
     while True:
         try:
             response = requests.get(url)
-            house = BeautifulSoup(response.text, 'lxml-xml')
+            house = BeautifulSoup(response.text, 'lxml-xml') #만약 에러나면 'lxml-xml'-> 'lxml'로 바꿔주기
             te = house.find('item')
             print(f'te:{te}')
 
@@ -151,7 +152,7 @@ def process_api_request(url):
 
 
 # 병렬 처리를 위한 ThreadPoolExecutor 생성
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)  # 4개의 스레드 사용
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)  # 5개의 스레드 사용
 
 key = 'SrFzjmH%2BgKmA7CsGoHxtz1P5KyaTntW7512fKrftU02QY6VgGwQF2McCl3TzV1usyFiNHS7xvPYlZ0gBiJnRmQ%3D%3D'
 # SrFzjmH%2BgKmA7CsGoHxtz1P5KyaTntW7512fKrftU02QY6VgGwQF2McCl3TzV1usyFiNHS7xvPYlZ0gBiJnRmQ%3D%3D
