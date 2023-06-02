@@ -1,0 +1,78 @@
+-- 1. 데이터베이스 생성
+CREATE DATABASE data_collection;
+
+-- 2. 스키마 생성
+CREATE SCHEMA data_collection.raw_data;
+CREATE SCHEMA data_collection.analytics;
+
+-- 3. 테이블 생성
+CREATE OR REPLACE TABLE data_collection.raw_data.jobs (
+    acptMthd varchar(2000),
+    deadline varchar(50),
+    emplymShp char(6),
+    emplymShpNm varchar(6),
+    startDd char(10) not null,
+    jobId varchar(20) not null primary key,
+    jobcls varchar(50),
+    jobclsNm varchar(50),
+    oranNm varchar(50),
+    organYn char(1),
+    recrtTitle varchar(1000),
+    stmId char(1),
+    stmNm varchar(50),
+    endDd varchar(10),
+    workPlc varchar(50),
+    acptMthdCd varchar(6),
+    age varchar(2),
+    ageYn char(1),
+    clerk varchar(50),
+    clerkContt varchar(15),
+    clltPrnnum varchar(4),
+    createDt varchar(100),
+    detCnts varchar(4000),
+    etcItm varchar(4000),
+    homepage varchar(100),
+    plDetAddr varchar(200),
+    plbizNm varchar(1000),
+    updDt varchar(100),
+    sysCreatedAt TIMESTAMP_NTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(0)::TIMESTAMP_NTZ
+);
+
+CREATE OR REPLACE TABLE data_collection.raw_data.projects (
+    projType varchar(30) not null,
+    projNo char(20) not null primary key,
+    projPlanChangeNo int,
+    projYear char(4) not null,
+    contProjYn char(1) not null,
+    contProjStartYear char(4),
+    projTypeCd char(10) not null,
+    projTypeNm varchar(100) not null,
+    nonBudgYn char(1),
+    specProjCd varchar(10),
+    projNm varchar(100),
+    admProvNm varchar(10),
+    admDistCd varchar(10),
+    admDistNm varchar(50) not null,
+    institutionId varchar(10),
+    projStartDd char(10) not null,
+    projEndDd char(10) not null,
+    planStatusCd varchar(20),
+    targetEmployment int not null,
+    firstlAttachment varchar(100),
+    recentApprovalAttachment varchar(100),
+    delYn char(1) not null,
+    sysCreatedAt TIMESTAMP_NTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(0)::TIMESTAMP_NTZ
+);
+
+-- 4. 데이터 벌크 업데이트
+COPY INTO data_collection.raw_data.jobs (acptMthd,deadline,emplymShp,emplymShpNm,startDd,jobId,jobcls,jobclsNm,oranNm,organYn,recrtTitle,stmId,stmNm,endDd,workPlc,acptMthdCd,age,ageYn,clerk,clerkContt,clltPrnnum,createDt,detCnts,etcItm,homepage,plDetAddr,plbizNm,updDt)
+FROM 's3://silverworker/data_collection/Jobs.csv'
+credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY='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')
+FILE_FORMAT = (type='CSV' skip_header=1 FIELD_OPTIONALLY_ENCLOSED_BY='"');
+
+
+
+COPY INTO data_collection.raw_data.projects (projType,projNo,projPlanChangeNo,projYear,contProjYn,contProjStartYear,projTypeCd,projTypeNm,nonBudgYn,specProjCd,projNm,admProvNm,admDistCd,admDistNm,institutionId,projStartDd,projEndDd,planStatusCd,targetEmployment,firstlAttachment,recentApprovalAttachment,delYn)
+FROM 's3://silverworker/data_collection/projects.csv'
+credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY='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')
+FILE_FORMAT = (type='CSV' skip_header=1 FIELD_OPTIONALLY_ENCLOSED_BY='"');
