@@ -1,5 +1,6 @@
 # silverwork
 
+![image](https://github.com/DW-BI-Project/silverwork/assets/43624842/e97d513e-5bf9-4cda-94b6-06e2ae4c9bc9)
 
 
 ## 구조
