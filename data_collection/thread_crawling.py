@@ -1,4 +1,7 @@
-# xlml 없다면 install하기(pip install lxml)
+'''
+xlml 없다면 install하기 >>>pip install lxml
+'''
+
 import concurrent.futures
 import time
 
@@ -18,33 +21,43 @@ def process_api_request(url):
     global idx 
     global num 
     global datas
-    
+    global total_count
+    columns_form = ['acptMthdCd', 'age', 'ageLim', 'clerk', 'clerkContt', 'clltPrnnum', 'createDy',
+                                    'detCnts', 'etcItm', 'frAcptDd', 'homepage', 'jobId', 'lnkStmId', 'organYn',
+                                    'plDetAddr', 'plbizNm', 'repr', 'stmId', 'toAcptDd', 'updDy', 'wantedAuthNo',
+                                    'wantedTitle']
+
     worker_id = threading.get_ident()
     print(f"{worker_id} doing job.........")
 
-    idx += 1
     
+    print(f'{idx}/{total_count}')
+    idx += 1
+
+    # 배치 500 기준 로그 csv 파일 생성
     if idx % 501 == 0:
         num += 1
-        df = pd.DataFrame(datas,
-                            columns=['acptMthdCd', 'age', 'ageLim', 'clerk', 'clerkContt', 'clltPrnnum', 'createDy',
-                                    'detCnts', 'etcItm', 'frAcptDd', 'homepage', 'jobId', 'lnkStmId', 'organYn',
-                                    'plDetAddr', 'plbizNm', 'repr', 'stmId', 'toAcptDd', 'updDy', 'wantedAuthNo',
-                                    'wantedTitle'])
-        # print(df)
-        df.to_csv(f"2020_detail_back{num}.csv", encoding='utf-8-sig')
-        print(f'{num}번째 csv파일로 저장 완료했습니다! ')
+        df = pd.DataFrame(datas, columns=columns_form)
+        df.to_csv(f"2020_details_log_{num}.csv", encoding='utf-8-sig')
+        print(f'{num}번째 csv파일로 저장 완료했습니다!')
 
+    # 최종 csv 파일 생성
+    if total_count <= idx:
+        df = pd.DataFrame(datas, columns=columns_form)
+        df.to_csv(f"2020_details.csv", encoding='utf-8-sig')
+        print(f'모든 데이터를 csv파일로 저장 완료했습니다!')
+
+    # api 요청
     while True:
         try:
             response = requests.get(url)
-            house = BeautifulSoup(response.text, 'lxml-xml') #만약 에러나면 'lxml-xml'-> 'lxml'로 바꿔주기
+            house = BeautifulSoup(response.text, 'lxml-xml')
             te = house.find('item')
-            print(f'te:{te}')
+            #print(f'te:{te}')
 
             if isinstance(te, type(None)) is True:
-                print('서비스 에러입니다.')
-                time.sleep(5)  # 추가한 구문
+                print('api 요청시 SERVICE ERROR 발생... 다시 요청중...')
+                time.sleep(5)  
                 continue
             else:
                 break
@@ -152,31 +165,30 @@ def process_api_request(url):
 
 
 # 병렬 처리를 위한 ThreadPoolExecutor 생성
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)  # 5개의 스레드 사용
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)  # n 개의 스레드
 
-key = 'SrFzjmH%2BgKmA7CsGoHxtz1P5KyaTntW7512fKrftU02QY6VgGwQF2McCl3TzV1usyFiNHS7xvPYlZ0gBiJnRmQ%3D%3D'
+# 공공데이터 api 요청 시 필요한 발급받은 ServiceKey 값
+key = 'vkAm3dSI%2FvKLoPmiJZ7Ri%2BaQTPDmB151XefclOprrjay2WQ%2FfuYAu6Q%2FMO%2FHH8xScD8vqgtSn11NLBNefSjH2A%3D%3D'
 # SrFzjmH%2BgKmA7CsGoHxtz1P5KyaTntW7512fKrftU02QY6VgGwQF2McCl3TzV1usyFiNHS7xvPYlZ0gBiJnRmQ%3D%3D
 # vkAm3dSI%2FvKLoPmiJZ7Ri%2BaQTPDmB151XefclOprrjay2WQ%2FfuYAu6Q%2FMO%2FHH8xScD8vqgtSn11NLBNefSjH2A%3D%3D
 
-
-# 병렬 처리할 API 요청 URL 리스트
-#api_urls = [url for i in range(100)]
-idx = 0
-num = 0
-datas = []
-api_urls=[]
+# 병렬 처리할 API 요청 URL 리스트 만들기
+idx = 0 # 데이터 인덱스 
+num = 0 # 생성될 csv 파일 번호
+datas = [] 
+api_urls=[] 
 start_time = time.time()  # 작업 시작 시간 기록
-#jobId 리스트로 저장
-csv = pd.read_csv('search_2020_back.csv', encoding='utf-8-sig')
-jobId = csv['jobId']
+
+csv = pd.read_csv('search_2020.csv', encoding='utf-8-sig')  
+jobId = csv['jobId'] # jobId(공고의 Key값) 리스트로 저장
 jobId_list = jobId.values.tolist()
 
-for jobId in jobId_list: #start_idx 조정값
+for jobId in jobId_list: # 상세공고 url 리스트로 저장
     api_urls.append(f'http://apis.data.go.kr/B552474/SenuriService/getJobInfo?ServiceKey={key}&id={jobId}')
 
-#데이터 가져오기
-service_key = 'vkAm3dSI%2FvKLoPmiJZ7Ri%2BaQTPDmB151XefclOprrjay2WQ%2FfuYAu6Q%2FMO%2FHH8xScD8vqgtSn11NLBNefSjH2A%3D%3D'
-total_count = len(jobId_list) #  Length: 84634 중 2022년 6562개
+total_count = len(api_urls)
+api_urls = api_urls[::-1] # 1월부터 수집
+print(api_urls[:10]) 
 
 # 각 URL에 대해 병렬로 API 요청을 처리
 futures = [executor.submit(process_api_request, url) for url in api_urls]
@@ -188,6 +200,7 @@ for future in concurrent.futures.as_completed(futures):
     except Exception as e:
         print(e)
 
+# 시간 체크
 end_time = time.time()  # 작업 종료 시간 기록
 elapsed_time = end_time - start_time  # 작업에 걸린 시간 계산
 print(elapsed_time)
