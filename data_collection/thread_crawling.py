@@ -42,7 +42,7 @@ def process_api_request(url):
         print(f'{num}번째 csv파일로 저장 완료했습니다!')
 
     # 최종 csv 파일 생성
-    if total_count <= idx:
+   if total_count == idx + 1:
         df = pd.DataFrame(datas, columns=columns_form)
         df.to_csv(f"2020_details.csv", encoding='utf-8-sig')
         print(f'모든 데이터를 csv파일로 저장 완료했습니다!')

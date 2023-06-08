@@ -67,12 +67,12 @@ CREATE OR REPLACE TABLE data_collection.raw_data.projects (
 -- 4. 데이터 벌크 업데이트
 COPY INTO data_collection.raw_data.jobs (acptMthd,deadline,emplymShp,emplymShpNm,startDd,jobId,jobcls,jobclsNm,oranNm,organYn,recrtTitle,stmId,stmNm,endDd,workPlc,acptMthdCd,age,ageYn,clerk,clerkContt,clltPrnnum,createDt,detCnts,etcItm,homepage,plDetAddr,plbizNm,updDt)
 FROM 's3://silverworker/data_collection/Jobs.csv'
-credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY='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')
+credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY=' ')
 FILE_FORMAT = (type='CSV' skip_header=1 FIELD_OPTIONALLY_ENCLOSED_BY='"');
 
 
 
 COPY INTO data_collection.raw_data.projects (projType,projNo,projPlanChangeNo,projYear,contProjYn,contProjStartYear,projTypeCd,projTypeNm,nonBudgYn,specProjCd,projNm,admProvNm,admDistCd,admDistNm,institutionId,projStartDd,projEndDd,planStatusCd,targetEmployment,firstlAttachment,recentApprovalAttachment,delYn)
 FROM 's3://silverworker/data_collection/projects.csv'
-credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY='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')
+credentials=(AWS_KEY_ID='AKIATL3WTGCMZYV3GT4H' AWS_SECRET_KEY=' ')
 FILE_FORMAT = (type='CSV' skip_header=1 FIELD_OPTIONALLY_ENCLOSED_BY='"');
